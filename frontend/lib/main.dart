@@ -141,49 +141,27 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
           child: Column(
             children: [
               const Spacer(flex: 2),
-              // Logo
               Container(
                 width: 90, height: 90,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF6B2B),
-                  borderRadius: BorderRadius.circular(22),
-                ),
+                decoration: BoxDecoration(color: const Color(0xFFFF6B2B), borderRadius: BorderRadius.circular(22)),
                 child: const Icon(Icons.flutter_dash, size: 54, color: Colors.white),
               ),
               const SizedBox(height: 12),
               const Text('HWAK', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF0A0A0A), letterSpacing: 3)),
               const Spacer(flex: 2),
-              const Text(
-                'How do you want\nto use Hwak?',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A), height: 1.3),
-              ),
+              const Text('How do you want\nto use Hwak?', textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A), height: 1.3)),
               const SizedBox(height: 10),
               const Text('Choose your role to continue.', style: TextStyle(fontSize: 14, color: Colors.grey)),
               const Spacer(flex: 2),
-              // Client Card
-              _roleCard(
-                label: 'I am a Client',
-                icon: Icons.work_outline,
-                value: 'client',
-              ),
+              _roleCard(label: 'I am a Client', icon: Icons.work_outline, value: 'client'),
               const SizedBox(height: 14),
-              // Freelancer Card
-              _roleCard(
-                label: 'I am a Freelancer',
-                icon: Icons.laptop_mac_outlined,
-                value: 'freelancer',
-              ),
+              _roleCard(label: 'I am a Freelancer', icon: Icons.laptop_mac_outlined, value: 'freelancer'),
               const Spacer(flex: 2),
-              // Continue Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _selectedRole == null ? null : () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (_) => SignupScreen(role: _selectedRole!),
-                    ));
-                  },
+                  onPressed: _selectedRole == null ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => SignupScreen(role: _selectedRole!))),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF6B2B),
                     disabledBackgroundColor: const Color(0xFFFFBFA0),
@@ -198,13 +176,11 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               const SizedBox(height: 20),
               GestureDetector(
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())),
-                child: RichText(
-                  text: const TextSpan(
-                    text: 'Already have an account? ',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                    children: [TextSpan(text: 'Login', style: TextStyle(color: Color(0xFFFF6B2B), fontWeight: FontWeight.w700))],
-                  ),
-                ),
+                child: RichText(text: const TextSpan(
+                  text: 'Already have an account? ',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                  children: [TextSpan(text: 'Login', style: TextStyle(color: Color(0xFFFF6B2B), fontWeight: FontWeight.w700))],
+                )),
               ),
               const SizedBox(height: 24),
             ],
@@ -223,10 +199,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         decoration: BoxDecoration(
           color: selected ? const Color(0xFFFF6B2B).withOpacity(0.06) : Colors.white,
-          border: Border.all(
-            color: selected ? const Color(0xFFFF6B2B) : const Color(0xFFE0E0E0),
-            width: selected ? 2 : 1.5,
-          ),
+          border: Border.all(color: selected ? const Color(0xFFFF6B2B) : const Color(0xFFE0E0E0), width: selected ? 2 : 1.5),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -240,10 +213,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               child: Icon(icon, color: selected ? const Color(0xFFFF6B2B) : Colors.grey, size: 26),
             ),
             const SizedBox(width: 16),
-            Text(label, style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.w600,
-              color: selected ? const Color(0xFF0A0A0A) : Colors.grey.shade700,
-            )),
+            Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: selected ? const Color(0xFF0A0A0A) : Colors.grey.shade700)),
             const Spacer(),
             if (selected) const Icon(Icons.check_circle, color: Color(0xFFFF6B2B), size: 22),
           ],
@@ -267,6 +237,7 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   bool _obscure = true;
   bool _obscureConfirm = true;
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +269,7 @@ class _SignupScreenState extends State<SignupScreen> {
               const SizedBox(height: 32),
               _buildField('Full Name', 'Enter your full name', Icons.person_outline),
               const SizedBox(height: 18),
-              _buildField('Email', 'Enter your email', Icons.email_outlined, type: TextInputType.emailAddress),
+              _buildFieldWithController('Email', 'Enter your email', Icons.email_outlined, _emailController, type: TextInputType.emailAddress),
               const SizedBox(height: 18),
               _buildField('Phone Number', '03XX-XXXXXXX', Icons.phone_outlined, type: TextInputType.phone),
               const SizedBox(height: 18),
@@ -309,7 +280,9 @@ class _SignupScreenState extends State<SignupScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => OtpScreen(email: _emailController.text.isEmpty ? 'your@email.com' : _emailController.text),
+                  )),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF6B2B), foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -358,6 +331,27 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  Widget _buildFieldWithController(String label, String hint, IconData icon, TextEditingController controller, {TextInputType type = TextInputType.text}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF0A0A0A))),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          keyboardType: type,
+          decoration: InputDecoration(
+            hintText: hint, hintStyle: const TextStyle(color: Colors.grey),
+            prefixIcon: Icon(icon, color: const Color(0xFFFF6B2B)),
+            filled: true, fillColor: const Color(0xFFF8F8F8),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFFF6B2B), width: 1.5)),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPasswordField(String label, String hint, bool obscure, VoidCallback toggle) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,6 +373,116 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ══════════════════════════════════════════
+// OTP SCREEN
+// ══════════════════════════════════════════
+class OtpScreen extends StatefulWidget {
+  final String email;
+  const OtpScreen({super.key, required this.email});
+
+  @override
+  State<OtpScreen> createState() => _OtpScreenState();
+}
+
+class _OtpScreenState extends State<OtpScreen> {
+  final List<TextEditingController> _controllers = List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white, elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF0A0A0A)),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              Container(
+                width: 80, height: 80,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF6B2B).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.mark_email_unread_outlined, color: Color(0xFFFF6B2B), size: 40),
+              ),
+              const SizedBox(height: 24),
+              const Text('Verify Your Email', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+              const SizedBox(height: 10),
+              Text(
+                'We sent a 6-digit code to\n${widget.email}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 15, color: Colors.grey, height: 1.5),
+              ),
+              const SizedBox(height: 40),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(6, (i) => SizedBox(
+                  width: 48, height: 56,
+                  child: TextField(
+                    controller: _controllers[i],
+                    focusNode: _focusNodes[i],
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    maxLength: 1,
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                      counterText: '',
+                      filled: true, fillColor: const Color(0xFFF8F8F8),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFFF6B2B), width: 2),
+                      ),
+                    ),
+                    onChanged: (val) {
+                      if (val.isNotEmpty && i < 5) _focusNodes[i + 1].requestFocus();
+                      else if (val.isEmpty && i > 0) _focusNodes[i - 1].requestFocus();
+                    },
+                  ),
+                )),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF6B2B), foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    elevation: 0,
+                  ),
+                  child: const Text('Verify', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Didn't receive code? ", style: TextStyle(color: Colors.grey)),
+                  GestureDetector(
+                    onTap: () {},
+                    child: const Text('Resend', style: TextStyle(color: Color(0xFFFF6B2B), fontWeight: FontWeight.w700)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
