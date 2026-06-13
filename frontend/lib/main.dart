@@ -705,7 +705,6 @@ class FreelancerDetailScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF8F8F8),
       body: CustomScrollView(
         slivers: [
-          // Header
           SliverToBoxAdapter(
             child: Container(
               color: Colors.white,
@@ -746,8 +745,6 @@ class FreelancerDetailScreen extends StatelessWidget {
               ]),
             ),
           ),
-
-          // About
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -760,8 +757,6 @@ class FreelancerDetailScreen extends StatelessWidget {
               ]),
             ),
           ),
-
-          // Skills
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -784,8 +779,6 @@ class FreelancerDetailScreen extends StatelessWidget {
               ]),
             ),
           ),
-
-          // Portfolio
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -813,12 +806,9 @@ class FreelancerDetailScreen extends StatelessWidget {
               ]),
             ),
           ),
-
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
-
-      // Bottom Bar
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
         decoration: BoxDecoration(
@@ -828,7 +818,7 @@ class FreelancerDetailScreen extends StatelessWidget {
         child: Row(children: [
           Expanded(
             child: OutlinedButton.icon(
-              onPressed: () {},
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(name: freelancer['name'] as String))),
               icon: const Icon(Icons.chat_bubble_outline, size: 18),
               label: const Text('Message'),
               style: OutlinedButton.styleFrom(
@@ -869,6 +859,126 @@ class FreelancerDetailScreen extends StatelessWidget {
         const SizedBox(width: 4),
         Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
       ]),
+    );
+  }
+}
+
+// ══════════════════════════════════════════
+// CHAT SCREEN
+// ══════════════════════════════════════════
+class ChatScreen extends StatefulWidget {
+  final String name;
+  const ChatScreen({super.key, required this.name});
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _msgController = TextEditingController();
+  final List<Map<String, dynamic>> _messages = [
+    {'text': 'Hi! I saw your task posting, I am interested.', 'isMe': false, 'time': '10:30 AM'},
+    {'text': 'Great! Can you share some of your previous work?', 'isMe': true, 'time': '10:32 AM'},
+    {'text': 'Sure, I can start tomorrow!', 'isMe': false, 'time': '10:35 AM'},
+  ];
+
+  void _sendMessage() {
+    if (_msgController.text.trim().isEmpty) return;
+    setState(() {
+      _messages.add({'text': _msgController.text.trim(), 'isMe': true, 'time': 'Now'});
+      _msgController.clear();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F8F8),
+      appBar: AppBar(
+        backgroundColor: Colors.white, elevation: 0,
+        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF0A0A0A)), onPressed: () => Navigator.pop(context)),
+        title: Row(children: [
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: const Color(0xFFFF6B2B).withOpacity(0.1),
+            child: Text(widget.name[0], style: const TextStyle(color: Color(0xFFFF6B2B), fontWeight: FontWeight.bold)),
+          ),
+          const SizedBox(width: 10),
+          Text(widget.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+        ]),
+        actions: [
+          IconButton(icon: const Icon(Icons.call_outlined, color: Color(0xFFFF6B2B)), onPressed: () {}),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final msg = _messages[index];
+                final bool isMe = msg['isMe'] as bool;
+                return Align(
+                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+                    decoration: BoxDecoration(
+                      color: isMe ? const Color(0xFFFF6B2B) : Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(16),
+                        topRight: const Radius.circular(16),
+                        bottomLeft: Radius.circular(isMe ? 16 : 4),
+                        bottomRight: Radius.circular(isMe ? 4 : 16),
+                      ),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6)],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      children: [
+                        Text(msg['text'] as String, style: TextStyle(fontSize: 14, color: isMe ? Colors.white : const Color(0xFF0A0A0A))),
+                        const SizedBox(height: 4),
+                        Text(msg['time'] as String, style: TextStyle(fontSize: 10, color: isMe ? Colors.white70 : Colors.grey)),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, -2))],
+            ),
+            child: Row(children: [
+              Expanded(
+                child: TextField(
+                  controller: _msgController,
+                  decoration: InputDecoration(
+                    hintText: 'Type a message...',
+                    hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                    filled: true, fillColor: const Color(0xFFF8F8F8),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                decoration: const BoxDecoration(color: Color(0xFFFF6B2B), shape: BoxShape.circle),
+                child: IconButton(
+                  icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                  onPressed: _sendMessage,
+                ),
+              ),
+            ]),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1175,18 +1285,67 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   }
 
   Widget _messagesTab() {
-    return Center(
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Container(
-          width: 80, height: 80,
-          decoration: BoxDecoration(color: const Color(0xFFFF6B2B).withOpacity(0.1), shape: BoxShape.circle),
-          child: const Icon(Icons.chat_bubble_outline, color: Color(0xFFFF6B2B), size: 40),
-        ),
-        const SizedBox(height: 16),
-        const Text('No Messages Yet', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+    final conversations = [
+      {'name': 'Ayesha Khan', 'lastMsg': 'Sure, I can start tomorrow!', 'time': '2m ago', 'unread': 2, 'online': true},
+      {'name': 'Bilal Ahmed', 'lastMsg': 'I sent you the draft video.', 'time': '1h ago', 'unread': 0, 'online': false},
+      {'name': 'Sara Malik', 'lastMsg': 'Thank you for the order 🙏', 'time': 'Yesterday', 'unread': 1, 'online': true},
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
         const SizedBox(height: 8),
-        const Text('Your conversations will appear here', style: TextStyle(fontSize: 14, color: Colors.grey)),
-      ]),
+        const Text('Messages', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+        const SizedBox(height: 16),
+        ...conversations.map((c) => GestureDetector(
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(name: c['name'] as String))),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(16),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8)],
+            ),
+            child: Row(children: [
+              Stack(children: [
+                CircleAvatar(
+                  radius: 26,
+                  backgroundColor: const Color(0xFFFF6B2B).withOpacity(0.1),
+                  child: Text((c['name'] as String)[0], style: const TextStyle(color: Color(0xFFFF6B2B), fontWeight: FontWeight.bold, fontSize: 18)),
+                ),
+                if (c['online'] as bool)
+                  Positioned(
+                    right: 0, bottom: 0,
+                    child: Container(
+                      width: 12, height: 12,
+                      decoration: BoxDecoration(
+                        color: Colors.green, shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+              ]),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(c['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0A0A0A))),
+                const SizedBox(height: 4),
+                Text(c['lastMsg'] as String, style: const TextStyle(fontSize: 12, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ])),
+              const SizedBox(width: 8),
+              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text(c['time'] as String, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                const SizedBox(height: 6),
+                if ((c['unread'] as int) > 0)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(color: const Color(0xFFFF6B2B), borderRadius: BorderRadius.circular(10)),
+                    child: Text('${c['unread']}', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                  ),
+              ]),
+            ]),
+          ),
+        )),
+      ],
     );
   }
 
