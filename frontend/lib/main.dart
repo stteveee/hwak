@@ -403,7 +403,9 @@ class _OtpScreenState extends State<OtpScreen> {
               child: ElevatedButton(
                 onPressed: () => Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (_) => ClientHomeScreen(role: widget.role)),
+                  MaterialPageRoute(builder: (_) => widget.role == 'freelancer'
+    ? const FreelancerHomeScreen()
+    : ClientHomeScreen(role: widget.role)),
                   (route) => false,
                 ),
                 style: ElevatedButton.styleFrom(
@@ -1446,5 +1448,578 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         ],
       ),
     );
+  }
+}
+// ══════════════════════════════════════════
+// FREELANCER HOME SCREEN
+// ══════════════════════════════════════════
+class FreelancerHomeScreen extends StatefulWidget {
+  const FreelancerHomeScreen({super.key});
+  @override
+  State<FreelancerHomeScreen> createState() => _FreelancerHomeScreenState();
+}
+
+class _FreelancerHomeScreenState extends State<FreelancerHomeScreen> {
+  int _selectedIndex = 0;
+  String? _selectedCategory;
+
+  final List<String> _categories = ['All', 'Tech', 'Design', 'Video', 'Marketing', 'AI', 'Tuition', 'Home', 'Business'];
+
+  final List<Map<String, dynamic>> _tasks = [
+    {'title': 'Design a logo for my startup', 'category': 'Design', 'budget': 'PKR 5,000', 'deadline': '15/6/2026', 'bids': 3, 'desc': 'Need a professional logo for my new startup. Brand colors are blue and white. Minimal design preferred.'},
+    {'title': 'Build a Flutter landing page', 'category': 'Tech', 'budget': 'PKR 15,000', 'deadline': '20/6/2026', 'bids': 7, 'desc': 'Need a simple landing page for my app in Flutter web. Should have hero section, features, and contact form.'},
+    {'title': 'Write 5 SEO blog posts', 'category': 'Marketing', 'budget': 'PKR 8,000', 'deadline': '18/6/2026', 'bids': 2, 'desc': 'Need 5 SEO-optimized blog posts about digital marketing. Each post should be 800-1000 words.'},
+    {'title': 'Edit a 60-second promo video', 'category': 'Video', 'budget': 'PKR 6,000', 'deadline': '17/6/2026', 'bids': 5, 'desc': 'Need a 60-second promotional video edited for my product launch. Raw footage will be provided.'},
+    {'title': 'Set up AI chatbot for my website', 'category': 'AI', 'budget': 'PKR 12,000', 'deadline': '22/6/2026', 'bids': 1, 'desc': 'Need an AI chatbot integrated into my WordPress website. Should answer FAQs and capture leads.'},
+    {'title': 'Online Maths tuition for O-levels', 'category': 'Tuition', 'budget': 'PKR 4,000', 'deadline': '25/6/2026', 'bids': 4, 'desc': 'Need a maths tutor for my child preparing for O-levels. 2 hours per week for one month.'},
+  ];
+
+  List<Map<String, dynamic>> get _filteredTasks {
+    if (_selectedCategory == null || _selectedCategory == 'All') return _tasks;
+    return _tasks.where((t) => t['category'] == _selectedCategory).toList();
+  }
+
+  Widget _homeTab() {
+    return Column(
+      children: [
+        // Top bar
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+          child: Row(children: [
+            Container(
+              width: 44, height: 44,
+              decoration: BoxDecoration(color: const Color(0xFFFF6B2B), borderRadius: BorderRadius.circular(12)),
+              child: const Icon(Icons.flutter_dash, color: Colors.white, size: 26),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Welcome back 👋', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('Browse available tasks', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+            ])),
+            Container(
+              width: 44, height: 44,
+              decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(12),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)],
+              ),
+              child: const Icon(Icons.notifications_none, color: Color(0xFF0A0A0A)),
+            ),
+          ]),
+        ),
+        // Search bar
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(14),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8)],
+            ),
+            child: const TextField(
+              decoration: InputDecoration(
+                hintText: 'Search tasks...',
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                prefixIcon: Icon(Icons.search, color: Color(0xFFFF6B2B)),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+        ),
+        // Categories
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 38,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: _categories.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (_, i) {
+              final cat = _categories[i];
+              final selected = _selectedCategory == cat || (_selectedCategory == null && cat == 'All');
+              return GestureDetector(
+                onTap: () => setState(() => _selectedCategory = cat == 'All' ? null : cat),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: selected ? const Color(0xFFFF6B2B) : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: selected ? const Color(0xFFFF6B2B) : const Color(0xFFE0E0E0)),
+                  ),
+                  child: Text(cat, style: TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.w600,
+                    color: selected ? Colors.white : Colors.grey.shade700,
+                  )),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 14),
+        // Tasks list
+        Expanded(
+          child: _filteredTasks.isEmpty
+              ? const Center(child: Text('No tasks in this category', style: TextStyle(color: Colors.grey)))
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: _filteredTasks.length,
+                  itemBuilder: (_, i) {
+                    final task = _filteredTasks[i];
+                    return GestureDetector(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TaskDetailScreen(task: task))),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 14),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white, borderRadius: BorderRadius.circular(16),
+                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8)],
+                        ),
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Row(children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFF6B2B).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(task['category'] as String, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFFF6B2B))),
+                            ),
+                            const Spacer(),
+                            const Icon(Icons.access_time, size: 13, color: Colors.grey),
+                            const SizedBox(width: 4),
+                            Text(task['deadline'] as String, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                          ]),
+                          const SizedBox(height: 10),
+                          Text(task['title'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF0A0A0A))),
+                          const SizedBox(height: 6),
+                          Text(task['desc'] as String, style: const TextStyle(fontSize: 12, color: Colors.grey, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 12),
+                          Row(children: [
+                            const Icon(Icons.payments_outlined, size: 14, color: Color(0xFF0A0A0A)),
+                            const SizedBox(width: 4),
+                            Text(task['budget'] as String, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+                            const Spacer(),
+                            const Icon(Icons.people_outline, size: 14, color: Colors.grey),
+                            const SizedBox(width: 4),
+                            Text('${task['bids']} bids', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                            const SizedBox(width: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFF6B2B),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Text('Bid Now', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                            ),
+                          ]),
+                        ]),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _myBidsTab() {
+    final myBids = [
+      {'title': 'Design a logo for my startup', 'myBid': 'PKR 4,500', 'status': 'Pending', 'deadline': '15/6/2026'},
+      {'title': 'Edit a 60-second promo video', 'myBid': 'PKR 5,500', 'status': 'Accepted', 'deadline': '17/6/2026'},
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        const SizedBox(height: 8),
+        const Text('My Bids', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+        const SizedBox(height: 16),
+        ...myBids.map((bid) => Container(
+          margin: const EdgeInsets.only(bottom: 14),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(16),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8)],
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Expanded(child: Text(bid['title'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0A0A0A)))),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: bid['status'] == 'Accepted' ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(bid['status'] as String, style: TextStyle(
+                  fontSize: 11, fontWeight: FontWeight.w600,
+                  color: bid['status'] == 'Accepted' ? Colors.green : Colors.orange,
+                )),
+              ),
+            ]),
+            const SizedBox(height: 10),
+            Row(children: [
+              const Icon(Icons.payments_outlined, size: 14, color: Color(0xFFFF6B2B)),
+              const SizedBox(width: 4),
+              Text('Your bid: ${bid['myBid']}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFFFF6B2B))),
+              const Spacer(),
+              const Icon(Icons.calendar_today_outlined, size: 13, color: Colors.grey),
+              const SizedBox(width: 4),
+              Text(bid['deadline'] as String, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            ]),
+          ]),
+        )),
+      ],
+    );
+  }
+
+  Widget _messagesTab() {
+    final conversations = [
+      {'name': 'Ahmed Ali', 'lastMsg': 'Can you start by Monday?', 'time': '5m ago', 'unread': 1, 'online': true},
+      {'name': 'Fatima Khan', 'lastMsg': 'Please send your portfolio', 'time': '2h ago', 'unread': 0, 'online': false},
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        const SizedBox(height: 8),
+        const Text('Messages', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+        const SizedBox(height: 16),
+        ...conversations.map((c) => GestureDetector(
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(name: c['name'] as String))),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(16),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8)],
+            ),
+            child: Row(children: [
+              Stack(children: [
+                CircleAvatar(
+                  radius: 26,
+                  backgroundColor: const Color(0xFFFF6B2B).withOpacity(0.1),
+                  child: Text((c['name'] as String)[0], style: const TextStyle(color: Color(0xFFFF6B2B), fontWeight: FontWeight.bold, fontSize: 18)),
+                ),
+                if (c['online'] as bool)
+                  Positioned(right: 0, bottom: 0,
+                    child: Container(width: 12, height: 12,
+                      decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
+                    ),
+                  ),
+              ]),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(c['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0A0A0A))),
+                const SizedBox(height: 4),
+                Text(c['lastMsg'] as String, style: const TextStyle(fontSize: 12, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ])),
+              const SizedBox(width: 8),
+              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text(c['time'] as String, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                const SizedBox(height: 6),
+                if ((c['unread'] as int) > 0)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(color: const Color(0xFFFF6B2B), borderRadius: BorderRadius.circular(10)),
+                    child: Text('${c['unread']}', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                  ),
+              ]),
+            ]),
+          ),
+        )),
+      ],
+    );
+  }
+
+  Widget _profileTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(children: [
+        const SizedBox(height: 20),
+        Stack(
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: const Color(0xFFFF6B2B).withOpacity(0.1),
+              child: const Icon(Icons.person, color: Color(0xFFFF6B2B), size: 50),
+            ),
+            Positioned(
+              right: 0, bottom: 0,
+              child: Container(
+                width: 28, height: 28,
+                decoration: const BoxDecoration(color: Color(0xFFFF6B2B), shape: BoxShape.circle),
+                child: const Icon(Icons.edit, color: Colors.white, size: 14),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        const Text('Your Name', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+        const SizedBox(height: 4),
+        const Text('your@email.com', style: TextStyle(fontSize: 14, color: Colors.grey)),
+        const SizedBox(height: 8),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(color: const Color(0xFFFF6B2B).withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+            child: const Text('Freelancer', style: TextStyle(color: Color(0xFFFF6B2B), fontWeight: FontWeight.w600, fontSize: 13)),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+            child: const Text('Level 1', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600, fontSize: 13)),
+          ),
+        ]),
+        const SizedBox(height: 20),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          _statBox('0', 'Orders'),
+          _statBox('0', 'Reviews'),
+          _statBox('0', 'Earnings'),
+        ]),
+        const SizedBox(height: 24),
+        _profileTile(Icons.person_outline, 'Edit Profile'),
+        _profileTile(Icons.work_outline, 'My Skills'),
+        _profileTile(Icons.photo_library_outlined, 'Portfolio'),
+        _profileTile(Icons.lock_outline, 'Change Password'),
+        _profileTile(Icons.help_outline, 'Help & Support'),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (_) => const WelcomeScreen()), (route) => false),
+            icon: const Icon(Icons.logout, color: Colors.red),
+            label: const Text('Logout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              side: const BorderSide(color: Colors.red),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget _statBox(String value, String label) {
+    return Column(children: [
+      Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+      const SizedBox(height: 4),
+      Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+    ]);
+  }
+
+  Widget _profileTile(IconData icon, String label) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white, borderRadius: BorderRadius.circular(14),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 6)],
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: const Color(0xFFFF6B2B)),
+        title: Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        onTap: () {},
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F8F8),
+      body: SafeArea(
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: [
+            _homeTab(),
+            _myBidsTab(),
+            _messagesTab(),
+            _profileTab(),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (i) => setState(() => _selectedIndex = i),
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFFFF6B2B),
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.gavel_outlined), activeIcon: Icon(Icons.gavel), label: 'My Bids'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profile'),
+        ],
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════
+// TASK DETAIL SCREEN
+// ══════════════════════════════════════════
+class TaskDetailScreen extends StatefulWidget {
+  final Map<String, dynamic> task;
+  const TaskDetailScreen({super.key, required this.task});
+
+  @override
+  State<TaskDetailScreen> createState() => _TaskDetailScreenState();
+}
+
+class _TaskDetailScreenState extends State<TaskDetailScreen> {
+  final TextEditingController _bidController = TextEditingController();
+  final TextEditingController _proposalController = TextEditingController();
+  bool _showBidForm = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F8F8),
+      appBar: AppBar(
+        backgroundColor: Colors.white, elevation: 0,
+        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF0A0A0A)), onPressed: () => Navigator.pop(context)),
+        title: const Text('Task Detail', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // Task card
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8)],
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(color: const Color(0xFFFF6B2B).withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                child: Text(widget.task['category'] as String, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFFF6B2B))),
+              ),
+              const SizedBox(height: 12),
+              Text(widget.task['title'] as String, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+              const SizedBox(height: 12),
+              Text(widget.task['desc'] as String, style: const TextStyle(fontSize: 14, color: Colors.grey, height: 1.6)),
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 12),
+              Row(children: [
+                _infoItem(Icons.payments_outlined, 'Budget', widget.task['budget'] as String),
+                const SizedBox(width: 24),
+                _infoItem(Icons.calendar_today_outlined, 'Deadline', widget.task['deadline'] as String),
+                const SizedBox(width: 24),
+                _infoItem(Icons.people_outline, 'Bids', '${widget.task['bids']} placed'),
+              ]),
+            ]),
+          ),
+          const SizedBox(height: 20),
+
+          // Bid form
+          if (_showBidForm) ...[
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8)],
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('Place Your Bid', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+                const SizedBox(height: 16),
+                const Text('Your Bid Amount (PKR)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF0A0A0A))),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _bidController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your bid amount',
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    prefixIcon: const Icon(Icons.payments_outlined, color: Color(0xFFFF6B2B)),
+                    filled: true, fillColor: const Color(0xFFF8F8F8),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFFF6B2B), width: 1.5)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text('Proposal', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF0A0A0A))),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _proposalController,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: 'Why should the client hire you? Describe your approach...',
+                    hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+                    filled: true, fillColor: const Color(0xFFF8F8F8),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFFF6B2B), width: 1.5)),
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Bid placed successfully! 🎉'), backgroundColor: Color(0xFFFF6B2B)),
+                      );
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF6B2B), foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)), elevation: 0,
+                    ),
+                    child: const Text('Submit Bid', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+              ]),
+            ),
+          ] else ...[
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => setState(() => _showBidForm = true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF6B2B), foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)), elevation: 0,
+                ),
+                child: const Text('Place a Bid', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatScreen(name: 'Client'))),
+                icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                label: const Text('Message Client'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFFFF6B2B),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: const BorderSide(color: Color(0xFFFF6B2B)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 32),
+        ]),
+      ),
+    );
+  }
+
+  Widget _infoItem(IconData icon, String label, String value) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        Icon(icon, size: 14, color: const Color(0xFFFF6B2B)),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+      ]),
+      const SizedBox(height: 4),
+      Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0A0A0A))),
+    ]);
   }
 }
